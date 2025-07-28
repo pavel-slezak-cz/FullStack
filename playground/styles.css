@@ -1,0 +1,60 @@
+table, th {
+    border: 1px solid #333;
+    border-collapse: collapse;
+    padding: 8px;
+}
+
+td {
+    border: none;
+    padding: 8px;
+}
+
+thead th, tfoot td {
+    border: 1px solid #333;
+    font-weight: bold;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #fffacd; /* světle žlutá */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #e6f7ff; /* světle modrá */
+}
+tbody tr:hover {
+    background-color: #f6afb9;
+}
+/* Obecný styl pro formulář */
+#contactForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+}
+
+/* Každá položka formuláře */
+.form-group {
+    flex: 1 1 200px; /* Roste, ale má minimálně 200px šířku */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Vizuální úpravy pro inputy a tlačítko */
+input, button {
+    padding: 8px;
+    font-size: 1rem;
+}
+
+/* Tablet: dvě řady */
+@media (max-width: 900px) {
+    .form-group {
+        flex: 1 1 45%; /* dvě položky vedle sebe */
+    }
+}
+
+/* Mobil: každý řádek pod sebe */
+@media (max-width: 600px) {
+    .form-group {
+        flex: 1 1 100%; /* každý na nový řádek */
+    }
+}
