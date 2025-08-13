@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Počasí</title>
+</head>
+<body>
+<h1>Počasí ve městech</h1>
+<p>Zadej 1–3 města oddělená čárkou nebo středníkem.</p>
+
+<form id="weather-form">
+  <input type="text" id="city-input" placeholder="Praha, Brno, Ostrava">
+  <button type="submit">Zobrazit počasí</button>
+</form>
+
+<div id="error" style="color:red;margin-top:1em;"></div>
+<div id="results" style="margin-top:1em;"></div>
+
+<script>
+  // Získání souřadnic
+  async function getCityCoords(cityName) {
+    try {
+      const response = await fetch(
+              `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&language=cs&format=json`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.results || data.results.length === 0) {
+        throw new Error(`Souřadnice pro město "${cityName}" nebyly nalezeny.`);
+      }
+
+      const { latitude, longitude, name } = data.results[0];
+      return { latitude, longitude, name };
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Funkce pro získání předpovědi
+  async function getForecast({ latitude, longitude }) {
+    try {
+      const response = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.daily || !data.daily.temperature_2m_max || !data.daily.temperature_2m_min) {
+        throw new Error("Nepodařilo se načíst předpověď.");
+      }
+
+      return {
+        max: data.daily.temperature_2m_max[0],
+        min: data.daily.temperature_2m_min[0]
+      };
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Ovládání formuláře
+  document.getElementById("weather-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const input = document.getElementById("city-input").value;
+    const cities = input
+            .split(/[,;]/)
+            .map(c => c.trim())
+            .filter(c => c);
+
+    const errorDiv = document.getElementById("error");
+    const resultsDiv = document.getElementById("results");
+    errorDiv.textContent = "";
+    resultsDiv.innerHTML = "";
+
+    if (cities.length === 0) {
+      errorDiv.textContent = "Zadej alespoň jedno město.";
+      return;
+    }
+    if (cities.length > 3) {
+      errorDiv.textContent = "Zadej maximálně tři města.";
+      return;
+    }
+
+    for (const city of cities) {
+      try {
+        const coords = await getCityCoords(city);
+        const forecast = await getForecast(coords);
+
+        const p = document.createElement("p");
+        p.innerHTML = `<strong>${coords.name}</strong>: min ${forecast.min}°C, max ${forecast.max}°C`;
+        resultsDiv.appendChild(p);
+
+      } catch (err) {
+        const p = document.createElement("p");
+        p.style.color = "red";
+        p.textContent = err.message;
+        resultsDiv.appendChild(p);
+      }
+    }
+  });
+</script>
+</body>
+</html>
