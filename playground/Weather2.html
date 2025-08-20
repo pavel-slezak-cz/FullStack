@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <title>Počasí</title>
+</head>
+<body>
+<h1>Počasí</h1>
+<p>Do formuláře zadej názvy nejvýše tří měst (odděl čárkou nebo středníkem).</p>
+<input id="citiesInput" />
+<button id="searchBtn">Hledat</button>
+<div id="error" style="color: red;"></div>
+<div id="results"></div>
+
+<script>
+  // Funkce pro získání souřadnic města
+  const getCityCoords = async (city) => {
+    try {
+      const response = await fetch(
+              `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=cs&format=json`
+      );
+      if (!response.ok) {
+        throw new Error("Chyba při načítání souřadnic");
+      }
+      const data = await response.json();
+      if (!data.results || data.results.length === 0) {
+        throw new Error(`Město "${city}" nebylo nalezeno`);
+      }
+      return {
+        city,
+        latitude: data.results[0].latitude,
+        longitude: data.results[0].longitude,
+      };
+    } catch (err) {
+      throw new Error(`Chyba pro "${city}": ${err.message}`);
+    }
+  };
+
+  // Funkce pro získání předpovědi
+  const getForecast = async ({ city, latitude, longitude }) => {
+    try {
+      const response = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`
+      );
+      if (!response.ok) {
+        throw new Error("Chyba při načítání předpovědi");
+      }
+      const data = await response.json();
+      return {
+        city,
+        max: data.daily.temperature_2m_max[0],
+        min: data.daily.temperature_2m_min[0],
+      };
+    } catch (err) {
+      throw new Error(`Chyba při předpovědi pro "${city}": ${err.message}`);
+    }
+  };
+
+  document.getElementById("searchBtn").addEventListener("click", async () => {
+    const input = document.getElementById("citiesInput").value;
+    const cities = input.split(/[,;]/).map(c => c.trim()).filter(c => c.length > 0);
+
+    const errorDiv = document.getElementById("error");
+    const resultsDiv = document.getElementById("results");
+    errorDiv.textContent = "";
+    resultsDiv.innerHTML = "";
+
+    if (cities.length === 0) {
+      errorDiv.textContent = "Zadej alespoň jedno město.";
+      return;
+    }
+    if (cities.length > 3) {
+      errorDiv.textContent = "Zadej maximálně tři města.";
+      return;
+    }
+
+    // Nejprve paralelně načti souřadnice
+    const coordsResults = await Promise.allSettled(cities.map(getCityCoords));
+
+    // Potom pro všechny úspěšné spustíme paralelně předpovědi
+    const validCoords = coordsResults
+            .filter(r => r.status === "fulfilled")
+            .map(r => r.value);
+
+    const forecastResults = await Promise.allSettled(validCoords.map(getForecast));
+
+    // Vypiš chyby (města co neexistují)
+    coordsResults.forEach(r => {
+      if (r.status === "rejected") {
+        const p = document.createElement("p");
+        p.style.color = "red";
+        p.textContent = r.reason.message;
+        resultsDiv.appendChild(p);
+      }
+    });
+
+    // Vypiš výsledky předpovědi
+    forecastResults.forEach(r => {
+      if (r.status === "fulfilled") {
+        const { city, max, min } = r.value;
+        const p = document.createElement("p");
+        p.textContent = `${city}: Max ${max}°C, Min ${min}°C`;
+        resultsDiv.appendChild(p);
+      } else {
+        const p = document.createElement("p");
+        p.style.color = "red";
+        p.textContent = r.reason.message;
+        resultsDiv.appendChild(p);
+      }
+    });
+  });
+</script>
+</body>
+</html>
