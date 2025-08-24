@@ -1,0 +1,14 @@
+{
+  "name": "root-workspace",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm --workspace client run dev",
+    "build": "npm --workspace client run build",
+    "preview": "npm --workspace client run preview",
+    "lint": "npm --workspace client run lint",
+    "test": "npm --workspace client run test"
+  }
+}
