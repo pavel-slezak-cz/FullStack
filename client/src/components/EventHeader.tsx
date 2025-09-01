@@ -1,6 +1,4 @@
 // src/components/EventHeader.tsx
-import React from 'react';
-
 type EventHeaderProps = {
     title: string;
     location?: string;

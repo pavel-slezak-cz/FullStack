@@ -1,5 +1,4 @@
 // src/components/EventTable.tsx
-import React from 'react';
 import type { DateRecord } from './EventTypes';
 
 type EventTableProps = {
@@ -7,7 +6,7 @@ type EventTableProps = {
 };
 
 export const EventTable: React.FC<EventTableProps> = ({ dates }) => {
-    // získáme všechna unikátní jména účastníků
+    // všechna unikátní jména účastníků
     const participants = Array.from(
         new Set(dates.flatMap(d => d.records.map(r => r.name)))
     );
@@ -18,7 +17,9 @@ export const EventTable: React.FC<EventTableProps> = ({ dates }) => {
             <tr>
                 <th>Participant</th>
                 {dates.map(d => (
-                    <th key={d.timestamp}>{new Date(d.timestamp).toLocaleDateString()}</th>
+                    <th key={d.timestamp}>
+                        {new Date(d.timestamp).toLocaleDateString()}
+                    </th>
                 ))}
             </tr>
             </thead>

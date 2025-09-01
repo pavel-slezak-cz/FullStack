@@ -1,4 +1,4 @@
-import React from 'react';
+// src/components/Event.tsx
 import type { EventProps } from './EventTypes';
 import { EventHeader } from './EventHeader';
 import { EventTable } from './EventTable';

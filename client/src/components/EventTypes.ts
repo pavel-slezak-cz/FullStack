@@ -1,5 +1,4 @@
 // src/components/EventTypes.ts
-
 export type UserRecord = {
     name: string;
     answer: 'yes' | 'no' | 'if-needed';
@@ -10,9 +9,20 @@ export type DateRecord = {
     records: UserRecord[];
 };
 
+export type PollingEvent = {
+    location?: string;
+    title: string;
+    id: string;
+    dates: DateRecord[];
+};
+
+// Pro původní Event komponentu (zobrazující tabulku)
 export type EventProps = {
     location?: string;
     id: string;
     title: string;
     dates: DateRecord[];
+};
+export type EventsListProps = {
+    data: PollingEvent[];
 };
