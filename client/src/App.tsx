@@ -1,34 +1,33 @@
+// src/App.tsx
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import EventsList from './components/EventsList';
 import EventDetail from './components/EventDetail';
 import NewEventForm from './components/NewEventForm';
 import Navigation from './components/Navigation';
-import type { PollingEvent } from './components/EventTypes';
-import { sampleEvents } from './testdata/sampleEvents';
+import { useEvent } from './hooks/useEvent';
 
 export default function App() {
-    const data: PollingEvent[] = sampleEvents;
-
     return (
         <>
-            <Navigation /> {/* 🧭 Vždy viditelné menu */}
+            <Navigation />
             <Routes>
                 <Route path="/" element={<Navigate to="/events" replace />} />
-                <Route path="/events" element={<EventsList data={data} />} />
+                <Route path="/events" element={<EventsList />} />
                 <Route path="/events/new" element={<NewEventForm />} />
-                <Route path="/events/:id" element={<EventWrapper data={data} />} />
+                <Route path="/events/:id" element={<EventDetailWrapper />} />
             </Routes>
         </>
     );
 }
 
-function EventWrapper({ data }: { data: PollingEvent[] }) {
+function EventDetailWrapper() {
     const { id } = useParams<{ id: string }>();
-    const event = data.find((e) => e.id === id);
+    const numericId = Number(id);
+    const { event, loading, error } = useEvent(numericId);
 
-    if (!event) {
-        return <p>Událost nenalezena.</p>;
-    }
+    if (loading) return <p>Načítám...</p>;
+    if (error) return <p style={{ color: 'red' }}>{error}</p>;
+    if (!event) return <p>Událost nenalezena.</p>;
 
     return <EventDetail data={event} />;
 }

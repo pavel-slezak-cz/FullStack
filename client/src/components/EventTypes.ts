@@ -12,7 +12,7 @@ export type DateRecord = {
 export type PollingEvent = {
     location?: string;
     title: string;
-    id: string;
+    id: number;
     dates: DateRecord[];
 };
 
