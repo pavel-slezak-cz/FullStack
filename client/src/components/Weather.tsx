@@ -1,18 +1,26 @@
 import { useWeather } from './useWeather';
 
-type WeatherProps = {
-    location: string;
+type Props = {
+    lat?: number;
+    lon?: number;
+    title?: string;
 };
 
-export function Weather({ location }: WeatherProps) {
-    const { weather, error } = useWeather(location);
+export default function Weather({ lat, lon, title = 'Počasí' }: Props) {
+    const { now, loading, error } = useWeather({ lat, lon });
 
-    if (error) return <p>Počasí se nepodařilo načíst: {error}</p>;
-    if (!weather) return <p>Načítám počasí pro {location}...</p>;
+    if (loading) return <div>Načítám počasí…</div>;
+    if (error)   return <div style={{ color: 'crimson' }}>Počasí: {error}</div>;
+    if (!now)    return <div>Počasí není k dispozici.</div>;
+
+    const when = new Date(now.time).toLocaleString();
 
     return (
-        <p>
-            Aktuální teplota v {location}: {weather.temperature}°C (měřeno v {weather.time})
-        </p>
+        <div style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, display: 'inline-block' }}>
+            <strong>{title}</strong>
+            <div>Aktuálně: {now.temperature} °C</div>
+            <div>Vítr: {now.windspeed} km/h (směr {now.winddirection}°)</div>
+            <small>Aktualizováno: {when}</small>
+        </div>
     );
 }

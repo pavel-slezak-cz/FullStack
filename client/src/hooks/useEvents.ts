@@ -1,31 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Fetcher } from 'openapi-typescript-fetch';
-import type { paths } from '../types';
+import { useEffect, useState } from 'react'
+import type { PollingEvent } from '../components/EventTypes'
 
-type EventResponse =
-    paths['/api/events/{id}']['get']['responses']['200']['content']['application/json'];
-
-export const useEvent = (id: number) => {
-    const [event, setEvent] = useState<EventResponse | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
+export function useEvent(id: number | string) {
+    const [event, setEvent] = useState<PollingEvent | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const fetchData = async () => {
+        let cancelled = false
+
+        const run = async () => {
             try {
-                const fetcher = Fetcher.for<paths>();
-                const getEvent = fetcher.path('/api/events/{id}').method('get').create();
-                const res = await getEvent({ id }); // 👈 jen { id }, bez 'params'
-                setEvent(res.data);
-            } catch (err) {
-                setError(err as Error);
+                const r = await fetch(`/api/events/${id}`)
+                if (!r.ok) throw new Error(`${r.status} ${r.statusText}`)
+                const obj = (await r.json()) as PollingEvent // detail vrací jeden objekt
+                if (!cancelled) setEvent(obj)
+            } catch (e: any) {
+                if (!cancelled) setError(e?.message ?? 'Chyba při načítání detailu')
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false)
             }
-        };
+        }
 
-        fetchData();
-    }, [id]);
+        setLoading(true)
+        setError(null)
+        setEvent(null)
+        run()
 
-    return { event, loading, error };
-};
+        return () => { cancelled = true }
+    }, [id])
+
+    return { event, loading, error }
+}

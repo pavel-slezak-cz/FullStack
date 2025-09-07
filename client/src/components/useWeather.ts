@@ -1,38 +1,69 @@
 import { useEffect, useState } from 'react';
 
-type WeatherData = {
-    temperature: number;
-    time: string;
+export type WeatherNow = {
+    temperature: number;       // °C
+    windspeed: number;         // km/h (Open-Meteo vrací v km/h)
+    winddirection: number;     // °
+    time: string;              // ISO
 };
 
-export function useWeather(location: string) {
-    const [weather, setWeather] = useState<WeatherData | null>(null);
-    const [error, setError] = useState<string | null>(null);
+export type WeatherState = {
+    now: WeatherNow | null;
+    loading: boolean;
+    error: string | null;
+};
+
+type Options = {
+    lat?: number;
+    lon?: number;
+};
+
+export function useWeather(opts: Options = {}) {
+    const lat = opts.lat ?? 50.0755;   // Praha
+    const lon = opts.lon ?? 14.4378;
+
+    const [state, setState] = useState<WeatherState>({
+        now: null,
+        loading: true,
+        error: null,
+    });
 
     useEffect(() => {
-        async function fetchWeather() {
+        let cancel = false;
+
+        async function run() {
             try {
-                const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=cs&format=json`);
-                const geoData = await geo.json();
-                const [place] = geoData.results ?? [];
-                if (!place) throw new Error('Location not found');
+                setState((s) => ({ ...s, loading: true, error: null }));
+                const url = new URL('https://api.open-meteo.com/v1/forecast');
+                url.searchParams.set('latitude', String(lat));
+                url.searchParams.set('longitude', String(lon));
+                url.searchParams.set('current_weather', 'true');
+                url.searchParams.set('timezone', 'auto');
 
-                const weatherRes = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m`
-                );
-                const weatherData = await weatherRes.json();
+                const r = await fetch(url.toString());
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const json = await r.json();
 
-                setWeather({
-                    temperature: weatherData.current.temperature_2m,
-                    time: weatherData.current.time,
-                });
-            } catch (err: any) {
-                setError(err.message ?? 'Unknown error');
+                const now: WeatherNow = {
+                    temperature: json.current_weather?.temperature,
+                    windspeed: json.current_weather?.windspeed,
+                    winddirection: json.current_weather?.winddirection,
+                    time: json.current_weather?.time,
+                };
+
+                if (!cancel) {
+                    setState({ now, loading: false, error: null });
+                }
+            } catch (e: any) {
+                if (!cancel) {
+                    setState({ now: null, loading: false, error: e?.message ?? 'Nepodařilo se načíst počasí' });
+                }
             }
         }
 
-        fetchWeather();
-    }, [location]);
+        run();
+        return () => { cancel = true; };
+    }, [lat, lon]);
 
-    return { weather, error };
+    return state;
 }

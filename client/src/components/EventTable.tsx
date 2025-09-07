@@ -1,39 +1,45 @@
 // src/components/EventTable.tsx
-import type { DateRecord } from './EventTypes';
-
-type EventTableProps = {
-    dates: DateRecord[];
+type AttendanceRecord = {
+    name: string;
+    answer: 'yes' | 'no' | 'maybe';
 };
 
-export const EventTable: React.FC<EventTableProps> = ({ dates }) => {
-    // všechna unikátní jména účastníků
-    const participants = Array.from(
-        new Set(dates.flatMap(d => d.records.map(r => r.name)))
-    );
+type EventDate = {
+    timestamp: number;
+    records: AttendanceRecord[];
+};
+
+type EventTableProps = {
+    dates: EventDate[];
+};
+
+export default function EventTable({ dates }: EventTableProps) {
+    if (!dates || dates.length === 0) {
+        return <div>Žádné termíny</div>;
+    }
 
     return (
-        <table border={1}>
+        <table>
             <thead>
             <tr>
-                <th>Participant</th>
-                {dates.map(d => (
-                    <th key={d.timestamp}>
-                        {new Date(d.timestamp).toLocaleDateString()}
-                    </th>
-                ))}
+                <th>Datum</th>
+                <th>Účastníci</th>
             </tr>
             </thead>
             <tbody>
-            {participants.map(name => (
-                <tr key={name}>
-                    <td>{name}</td>
-                    {dates.map(d => {
-                        const record = d.records.find(r => r.name === name);
-                        return <td key={d.timestamp}>{record ? record.answer : '-'}</td>;
-                    })}
+            {dates.map((d) => (
+                <tr key={d.timestamp}>
+                    <td>{new Date(d.timestamp).toLocaleDateString()}</td>
+                    <td>
+                        {d.records.map((r, i) => (
+                            <span key={i}>
+                  {r.name} ({r.answer}){i < d.records.length - 1 ? ', ' : ''}
+                </span>
+                        ))}
+                    </td>
                 </tr>
             ))}
             </tbody>
         </table>
     );
-};
+}

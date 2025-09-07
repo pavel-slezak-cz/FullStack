@@ -89,6 +89,7 @@ app.post('/api/events', (req, res) => {
     events.push(newEvent);
     res.status(201).json(newEvent);
 });
+app.get('/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
 
 // spuštění serveru

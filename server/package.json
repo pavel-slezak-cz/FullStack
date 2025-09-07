@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "tsc",

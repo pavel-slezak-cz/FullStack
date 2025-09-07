@@ -1,28 +1,40 @@
-import { useEffect, useState } from 'react';
-import type { PollingEvent } from '../components/EventTypes';
+import { useEffect, useState } from 'react'
+import type { PollingEvent } from '../components/EventTypes'
 
-
-export function useEvent(id: number) {
-    const [event, setEvent] = useState<PollingEvent | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+export function useEvent(id: string) {
+    const [event, setEvent] = useState<PollingEvent | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const fetchEvent = async () => {
+        let cancelled = false
+
+        if (!id) {
+            setError('Neplatné ID')
+            setLoading(false)
+            return
+        }
+
+        const run = async () => {
             try {
-                const res = await fetch(`/api/events/${id}`);
-                if (!res.ok) throw new Error(`Server error: ${res.status}`);
-                const data = await res.json();
-                setEvent(data);
-            } catch (err: any) {
-                setError(err.message || 'Neznámá chyba při načítání události');
+                const r = await fetch(`/api/events/${encodeURIComponent(id)}`)
+                if (!r.ok) throw new Error(`${r.status} ${r.statusText}`)
+                const obj = (await r.json()) as PollingEvent // detail vrací jeden objekt
+                if (!cancelled) setEvent(obj)
+            } catch (e: any) {
+                if (!cancelled) setError(e?.message ?? 'Chyba při načítání detailu')
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false)
             }
-        };
+        }
 
-        fetchEvent();
-    }, [id]);
+        setLoading(true)
+        setError(null)
+        setEvent(null)
+        run()
 
-    return { event, loading, error };
+        return () => { cancelled = true }
+    }, [id])
+
+    return { event, loading, error }
 }

@@ -4,9 +4,11 @@ type EventHeaderProps = {
     location?: string;
 };
 
-export const EventHeader: React.FC<EventHeaderProps> = ({ title, location }) => (
-    <div>
-        <h2>{title}</h2>
-        {location && <p>{location}</p>}
-    </div>
-);
+export default function EventHeader({ title, location }: EventHeaderProps) {
+    return (
+        <div style={{ paddingBottom: 8 }}>
+            <h2>{title}</h2>
+            {location && <p>Místo: {location}</p>}
+        </div>
+    );
+}

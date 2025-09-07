@@ -1,7 +1,7 @@
 // src/components/Event.tsx
 import type { PollingEvent } from './EventTypes';
-import { EventHeader } from './EventHeader';
-import { EventTable } from './EventTable';
+import EventHeader from './EventHeader';
+import EventTable from './EventTable';
 
 export const Event: React.FC<PollingEvent> = (props) => {
     return (
