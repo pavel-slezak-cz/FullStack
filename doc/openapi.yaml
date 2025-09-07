@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: Události API
+  version: 1.0.0
+  description: API pro správu událostí a hlasování o termínu
+
+servers:
+  - url: http://localhost:4000
+    description: Lokální vývojový server
+
+paths:
+  /api/events:
+    get:
+      summary: Získat seznam všech událostí
+      responses:
+        '200':
+          description: Seznam událostí
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+
+    post:
+      summary: Vytvořit novou událost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEvent'
+      responses:
+        '201':
+          description: Událost úspěšně vytvořena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Neplatná data
+
+  /api/events/{id}:
+    get:
+      summary: Získat detail jedné události podle ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detaily události
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Událost nenalezena
+
+components:
+  schemas:
+    UserRecord:
+      type: object
+      properties:
+        name:
+          type: string
+        answer:
+          type: string
+          enum: [yes, no, if-needed]
+    DateRecord:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRecord'
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        location:
+          type: string
+        dates:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateRecord'
+    NewEvent:
+      type: object
+      properties:
+        title:
+          type: string
+        location:
+          type: string
+        dates:
+          type: array
+          items:
+            type: integer
+        name:
+          type: string
