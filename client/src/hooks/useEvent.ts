@@ -10,7 +10,7 @@ export function useEvent(id: number) {
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const res = await fetch(`http://localhost:4000/api/events/${id}`);
+                const res = await fetch(`/api/events/${id}`);
                 if (!res.ok) throw new Error(`Server error: ${res.status}`);
                 const data = await res.json();
                 setEvent(data);

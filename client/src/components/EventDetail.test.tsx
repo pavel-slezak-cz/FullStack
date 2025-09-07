@@ -7,7 +7,7 @@ import type { PollingEvent } from './EventTypes';
 global.fetch = vi.fn();
 
 const mockEvent: PollingEvent = {
-    id: '1',
+    id: 1,
     title: 'Testovací událost',
     location: 'Praha',
     dates: [

@@ -14,14 +14,7 @@ export type PollingEvent = {
     title: string;
     id: number;
     dates: DateRecord[];
-};
 
-// Pro původní Event komponentu (zobrazující tabulku)
-export type EventProps = {
-    location?: string;
-    id: string;
-    title: string;
-    dates: DateRecord[];
 };
 export type EventsListProps = {
     data: PollingEvent[];

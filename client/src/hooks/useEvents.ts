@@ -9,7 +9,7 @@ export function useEvents() {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await fetch('http://localhost:4000/api/events');
+                const res = await fetch('/api/events');
                 if (!res.ok) throw new Error(`Chyba serveru: ${res.status}`);
                 const data = await res.json();
                 setEvents(data.items);

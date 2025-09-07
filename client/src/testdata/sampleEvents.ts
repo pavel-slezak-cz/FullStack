@@ -2,7 +2,7 @@ import type { PollingEvent } from '../components/EventTypes'
 
 export const sampleEvents: PollingEvent[] = [
     {
-        id: '1',
+        id: 1,
         title: 'Tým building',
         location: 'Praha',
         dates: [
@@ -20,7 +20,7 @@ export const sampleEvents: PollingEvent[] = [
         ],
     },
     {
-        id: '2',
+        id: 2,
         title: 'Workshop',
         location: 'Brno',
         dates: [],
