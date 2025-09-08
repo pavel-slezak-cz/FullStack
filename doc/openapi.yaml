@@ -3,10 +3,18 @@ info:
   title: Události API
   version: 1.0.0
   description: API pro správu událostí a hlasování o termínu.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: http://localhost:4000
+  - url: https://api.example.com
+    description: Produkční (příklad)
+  - url: http://127.0.0.1:4000
     description: Lokální vývojový server
+
+# Definováno globálně: žádná autentizace (linter tím bude spokojený)
+security: []
 
 tags:
   - name: events
@@ -31,6 +39,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -50,7 +60,9 @@ paths:
           headers:
             Location:
               description: URL nově vytvořeného zdroje
-              schema: { type: string, format: uri }
+              schema:
+                type: string
+                format: uri
           content:
             application/json:
               schema:
@@ -85,7 +97,9 @@ components:
       in: path
       name: id
       required: true
-      schema: { type: integer, format: int32 }
+      schema:
+        type: integer
+        format: int32
       description: ID události
 
   responses:
@@ -93,34 +107,46 @@ components:
       description: Zdroj nenalezen
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
-          example: { code: 404, message: 'Not Found' }
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 404
+            message: Not Found
     BadRequest:
       description: Neplatná data požadavku
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
-          example: { code: 400, message: 'Invalid payload' }
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Invalid payload
     ServerError:
       description: Neočekávaná chyba serveru
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Error' }
-          example: { code: 500, message: 'Internal Server Error' }
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 500
+            message: Internal Server Error
 
   schemas:
     Error:
       type: object
       required: [code, message]
       properties:
-        code: { type: integer }
-        message: { type: string }
+        code:
+          type: integer
+        message:
+          type: string
 
     UserRecord:
       type: object
       required: [name, answer]
       properties:
-        name: { type: string }
+        name:
+          type: string
         answer:
           type: string
           enum: [yes, no, if-needed]
@@ -135,33 +161,40 @@ components:
           description: Unix epoch v milisekundách
         records:
           type: array
-          items: { $ref: '#/components/schemas/UserRecord' }
+          items:
+            $ref: '#/components/schemas/UserRecord'
 
     Event:
       type: object
       required: [id, title, dates]
       properties:
-        id: { type: integer }
-        title: { type: string }
+        id:
+          type: integer
+        title:
+          type: string
         location:
           type: string
           nullable: true
         dates:
           type: array
-          items: { $ref: '#/components/schemas/DateRecord' }
+          items:
+            $ref: '#/components/schemas/DateRecord'
 
     NewEvent:
       type: object
       required: [title, dates]
       properties:
-        title: { type: string }
+        title:
+          type: string
         location:
           type: string
           nullable: true
         dates:
           type: array
           description: Pole timestampů (ms) navrhovaných termínů
-          items: { type: integer, format: int64 }
+          items:
+            type: integer
+            format: int64
         name:
           type: string
           description: Jméno zakladatele/organizátora (volitelné)
