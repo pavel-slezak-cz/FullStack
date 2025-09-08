@@ -1,21 +1,14 @@
-// src/components/EventTable.tsx
-type AttendanceRecord = {
-    name: string;
-    answer: 'yes' | 'no' | 'maybe';
-};
+import type { components } from '../types'
 
-type EventDate = {
-    timestamp: number;
-    records: AttendanceRecord[];
-};
+type DateRecord = components['schemas']['DateRecord']
 
-type EventTableProps = {
-    dates: EventDate[];
-};
+type Props = {
+    dates: DateRecord[]
+}
 
-export default function EventTable({ dates }: EventTableProps) {
+export default function EventTable({ dates }: Props) {
     if (!dates || dates.length === 0) {
-        return <div>Žádné termíny</div>;
+        return <div>Žádné termíny</div>
     }
 
     return (
@@ -31,15 +24,16 @@ export default function EventTable({ dates }: EventTableProps) {
                 <tr key={d.timestamp}>
                     <td>{new Date(d.timestamp).toLocaleDateString()}</td>
                     <td>
-                        {d.records.map((r, i) => (
+                        {d.records?.map((r, i) => (
                             <span key={i}>
-                  {r.name} ({r.answer}){i < d.records.length - 1 ? ', ' : ''}
-                </span>
+                                    {r.name} ({r.answer})
+                                {i < d.records.length - 1 ? ', ' : ''}
+                                </span>
                         ))}
                     </td>
                 </tr>
             ))}
             </tbody>
         </table>
-    );
+    )
 }

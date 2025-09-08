@@ -1,14 +1,14 @@
 // src/components/EventHeader.tsx
-type EventHeaderProps = {
+interface Props {
     title: string;
     location?: string;
-};
+}
 
-export default function EventHeader({ title, location }: EventHeaderProps) {
+export function EventHeader({ title, location }: Props) {
     return (
-        <div style={{ paddingBottom: 8 }}>
-            <h2>{title}</h2>
-            {location && <p>Místo: {location}</p>}
-        </div>
+        <h2>
+            {title}
+            {location ? ` (${location})` : ''}
+        </h2>
     );
 }

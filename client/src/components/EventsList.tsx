@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { PollingEvent } from './EventTypes'
+import { Fetcher } from 'openapi-typescript-fetch'
+import type { paths } from '../types'
+
+const client = Fetcher.for<paths>()
+
+// správné nastavení base URL pomocí configure
+client.configure({
+    baseUrl: 'http://localhost:4000',
+})
 
 export default function EventsList() {
-    const [data, setData] = useState<PollingEvent[] | null>(null)
+    const [data, setData] = useState<any[] | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        fetch('/api/events')
-            .then(async (r) => {
-                if (!r.ok) throw new Error(`${r.status} ${r.statusText}`)
-                const json = await r.json()
-                const items = Array.isArray(json) ? json : json.items // server vrací { items: [...] }
-                if (!Array.isArray(items)) throw new Error('Neplatná odpověď API (chybí items)')
-                return items as PollingEvent[]
-            })
-            .then(setData)
-            .catch((e) => setError(String(e)))
+        const fetchEvents = async () => {
+            try {
+                const call = client.path('/api/events').method('get').create()
+                const response = await call({})
+                setData(response.data.items)
+            } catch (e) {
+                setError(String(e))
+            }
+        }
+
+        fetchEvents()
     }, [])
 
     if (error) return <div style={{ color: 'crimson' }}>Error: {error}</div>
@@ -28,7 +37,7 @@ export default function EventsList() {
             <h1>Události</h1>
             <ul>
                 {data.map((e) => (
-                    <li key={String(e.id)}>
+                    <li key={e.id}>
                         <Link to={`/events/${e.id}`}>{e.title}</Link>
                         {e.location ? ` (${e.location})` : ''}
                     </li>
