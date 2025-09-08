@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "openapi-typescript": "^7.9.1",
+    "redoc-cli": "^0.13.21"
+  },
+  "dependencies": {
+    "openapi-typescript-fetch": "^2.2.1"
+  }
+}
