@@ -31,28 +31,137 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Event'
-              examples:
-                sample:
-                  summary: Ukázkový seznam
-                  value:
-                    items:
-                      - id: 1
-                        title: Super akce
-                        location: Praha
-                        dates:
-                          - timestamp: 1726514405258
-                            records:
-                              - name: Honza
-                                answer: yes
-                              - name: Jana
-                                answer: no
-                          - timestamp: 1726600861177
-                            records:
-                              - name: Jana
-                                answer: if-needed
-                      - id: 2
-                        title: Super akce 2
-                        location: Brno
-                        dates: []
         '500':
-          $ref: '#/components/
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags: [events]
+      summary: Vytvořit novou událost
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewEvent'
+      responses:
+        '201':
+          description: Událost úspěšně vytvořena
+          headers:
+            Location:
+              description: URL nově vytvořeného zdroje
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/events/{id}:
+    get:
+      tags: [events]
+      summary: Získat detail jedné události podle ID
+      operationId: getEvent
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Detaily události
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  parameters:
+    IdParam:
+      in: path
+      name: id
+      required: true
+      schema: { type: integer, format: int32 }
+      description: ID události
+
+  responses:
+    NotFound:
+      description: Zdroj nenalezen
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: 404, message: 'Not Found' }
+    BadRequest:
+      description: Neplatná data požadavku
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: 400, message: 'Invalid payload' }
+    ServerError:
+      description: Neočekávaná chyba serveru
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: 500, message: 'Internal Server Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: integer }
+        message: { type: string }
+
+    UserRecord:
+      type: object
+      required: [name, answer]
+      properties:
+        name: { type: string }
+        answer:
+          type: string
+          enum: [yes, no, if-needed]
+
+    DateRecord:
+      type: object
+      required: [timestamp, records]
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+          description: Unix epoch v milisekundách
+        records:
+          type: array
+          items: { $ref: '#/components/schemas/UserRecord' }
+
+    Event:
+      type: object
+      required: [id, title, dates]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        location:
+          type: string
+          nullable: true
+        dates:
+          type: array
+          items: { $ref: '#/components/schemas/DateRecord' }
+
+    NewEvent:
+      type: object
+      required: [title, dates]
+      properties:
+        title: { type: string }
+        location:
+          type: string
+          nullable: true
+        dates:
+          type: array
+          description: Pole timestampů (ms) navrhovaných termínů
+          items: { type: integer, format: int64 }
+        name:
+          type: string
+          description: Jméno zakladatele/organizátora (volitelné)
