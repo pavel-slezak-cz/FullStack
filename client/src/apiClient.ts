@@ -1,11 +1,11 @@
 import { Fetcher } from 'openapi-typescript-fetch';
 import type { paths } from './types';
 
+// Nastavíme přímo URL backendu
 const fetcher = Fetcher.for<paths>();
 
-// Volitelně: nastavíme základní URL (jinak použije relativní /api)
 fetcher.configure({
-    baseUrl: '/api', // proxy na localhost:4000
+    baseUrl: 'http://localhost:4000/api', // přímo backend
 });
 
 export const api = fetcher;

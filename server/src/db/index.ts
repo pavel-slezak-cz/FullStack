@@ -10,14 +10,17 @@ const schemaFile = path.resolve(__dirname, 'schema.sql');
 console.log('📂 DB file bude na:', dbFile);
 console.log('📂 Schema file hledám na:', schemaFile);
 
-// Připojení k databázi
+if (!fs.existsSync(schemaFile)) {
+    console.error('❌ Soubor schema.sql nebyl nalezen!');
+} else {
+    console.log('✅ Soubor schema.sql nalezen.');
+}
+
 const db = new Database(dbFile);
 
-// Načtení a spuštění SQL schématu
 const schema = fs.readFileSync(schemaFile, 'utf8');
 db.exec(schema);
 
-console.log(
-    '✅ Schéma bylo načteno a databáze připravena.');
+console.log('✅ Schéma bylo načteno a databáze připravena.');
 
 export default db;
