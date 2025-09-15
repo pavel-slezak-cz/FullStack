@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "eslint": "^9.35.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.4.0",
+    "openapi-typescript": "^7.9.1",
+    "redoc-cli": "^0.13.21",
+    "typescript-eslint": "^8.44.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "openapi-typescript-fetch": "^2.2.1"
+  }
+}

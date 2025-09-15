@@ -1,0 +1,38 @@
+// .eslintrc.cjs
+module.exports = {
+    root: true,
+    parser: "@typescript-eslint/parser", // TypeScript parser
+    parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: {
+            jsx: true,
+        },
+    },
+    env: {
+        browser: true,
+        node: true,
+        es2021: true,
+        jest: true,
+    },
+    plugins: [
+        "react",
+        "react-hooks",
+        "@typescript-eslint",
+        "stylistic",
+    ],
+    extends: [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
+        "plugin:stylistic/recommended",
+    ],
+    rules: {
+        "react/react-in-jsx-scope": "off", // nepotřebujeme ve Vite/React 18+
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn",
+    },
+    settings: {
+        react: { version: "detect" },
+    },
+};
