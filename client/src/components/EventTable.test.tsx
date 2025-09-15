@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { EventTable } from './EventTable';
+import EventTable from './EventTable'; // ✅ default import
 import type { DateRecord } from './EventTypes';
 
 const mockDates: DateRecord[] = [
@@ -21,12 +21,18 @@ describe('EventTable', () => {
     it('renders a table with participants and answers', () => {
         render(<EventTable dates={mockDates} />);
 
-        expect(screen.getByText('Participant')).toBeInTheDocument();
+        // Hlavičky tabulky
+        expect(screen.getByText('Datum')).toBeInTheDocument();
+        expect(screen.getByText('Účastníci')).toBeInTheDocument();
+
+        // Účastníci a jejich odpovědi
         expect(screen.getByText('Alice')).toBeInTheDocument();
         expect(screen.getByText('Bob')).toBeInTheDocument();
         expect(screen.getByText('yes')).toBeInTheDocument();
         expect(screen.getByText('no')).toBeInTheDocument();
         expect(screen.getByText('if-needed')).toBeInTheDocument();
-        expect(screen.getAllByRole('row')).toHaveLength(3); // header + 2 rows
+
+        // Ověření počtu řádků (hlavička + 2 termíny)
+        expect(screen.getAllByRole('row')).toHaveLength(3);
     });
 });

@@ -1,16 +1,7 @@
-// src/components/EventTable.tsx
-type AttendanceRecord = {
-    name: string;
-    answer: 'yes' | 'no' | 'maybe';
-};
-
-type EventDate = {
-    timestamp: number;
-    records: AttendanceRecord[];
-};
+import type { DateRecord } from './EventTypes';
 
 type EventTableProps = {
-    dates: EventDate[];
+    dates: DateRecord[];
 };
 
 export default function EventTable({ dates }: EventTableProps) {
@@ -33,7 +24,8 @@ export default function EventTable({ dates }: EventTableProps) {
                     <td>
                         {d.records.map((r, i) => (
                             <span key={i}>
-                  {r.name} ({r.answer}){i < d.records.length - 1 ? ', ' : ''}
+                  {r.name} ({r.answer})
+                                {i < d.records.length - 1 ? ', ' : ''}
                 </span>
                         ))}
                     </td>

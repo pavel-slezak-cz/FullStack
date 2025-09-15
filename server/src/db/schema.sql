@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS events (
                                       id INTEGER PRIMARY KEY AUTOINCREMENT,
                                       title TEXT NOT NULL,
-                                      location TEXT NOT NULL,
+                                      location TEXT,
                                       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

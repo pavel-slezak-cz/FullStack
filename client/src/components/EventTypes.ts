@@ -1,18 +1,11 @@
-export type PollAnswer = 'yes' | 'no' | 'maybe'
-
+// Typ reprezentující odpověď účastníka
 export type AttendanceRecord = {
-    name: string
-    answer: PollAnswer
-}
+    name: string;
+    answer: 'yes' | 'no' | 'if-needed';
+};
 
-export type EventDate = {
-    timestamp: number       // ms od epochy
-    records: AttendanceRecord[]
-}
-
-export type PollingEvent = {
-    id: number | string
-    title: string
-    location?: string
-    dates: EventDate[]
-}
+// Typ pro jeden termín události
+export type DateRecord = {
+    timestamp: number;
+    records: AttendanceRecord[];
+};
